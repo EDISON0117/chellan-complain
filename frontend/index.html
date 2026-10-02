@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StreetConnect — Your Street. Your Voice. Your Community.</title>
+  <meta name="description" content="A modern community-based complaint and civic awareness platform for residents, street moderators, and civic administrators.">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-expand-lg sc-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/index.html">
+        <img src="/assets/logo.svg" alt="StreetConnect Logo" width="36" height="36">
+        <span>Street<span class="text-primary">Connect</span></span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#scNavContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="scNavContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          <li class="nav-item">
+            <a class="nav-link active" href="/index.html"><i class="bi bi-house-door"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#complaints-section"><i class="bi bi-card-list"></i> Complaints</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pages/my-complaints.html"><i class="bi bi-collection"></i> My Complaints</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pages/community.html"><i class="bi bi-people"></i> Community</a>
+          </li>
+        </ul>
+
+        <!-- Right Side: Street Selector & User Session Section -->
+        <div id="navbar-auth-section" class="d-flex align-items-center gap-2">
+          <!-- Dynamically populated by Auth.renderNavbar() -->
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="container position-relative">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+          <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-subtle text-primary fw-bold small mb-3">
+            <i class="bi bi-broadcast text-primary"></i> Live Community Civic Network
+          </div>
+          <h1 class="hero-title mb-3">
+            Your Street.<br>
+            Your Voice.<br>
+            <span class="text-gradient">Your Community.</span>
+          </h1>
+          <p class="hero-subtitle mb-4 pe-lg-4">
+            Report broken streetlights, potholes, garbage piles, and water leaks directly to your neighborhood. 
+            Mobilize neighbor support, follow real-time status updates, and collaborate with official moderators to keep your street clean and safe.
+          </p>
+          <div class="d-flex flex-wrap gap-3 mb-4">
+            <a href="/pages/create-complaint.html" class="btn btn-primary btn-lg px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2 rounded-3">
+              <i class="bi bi-megaphone-fill"></i> Report an Issue
+            </a>
+            <a href="#complaints-section" class="btn btn-outline-dark btn-lg px-4 py-3 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
+              <i class="bi bi-search"></i> Explore Complaints
+            </a>
+          </div>
+
+          <!-- Street Quick Filter Pills -->
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="small text-muted fw-bold"><i class="bi bi-geo-alt"></i> Popular Streets:</span>
+            <div id="hero-street-pills" class="d-flex flex-wrap gap-1">
+              <button class="btn btn-sm btn-light border rounded-pill px-3 active" onclick="filterByStreet(null, this)">All Streets</button>
+              <button class="btn btn-sm btn-light border rounded-pill px-3" onclick="filterByStreet(1, this)">Gandhi Street, Tambaram</button>
+              <button class="btn btn-sm btn-light border rounded-pill px-3" onclick="filterByStreet(2, this)">Bharathi Nagar, Velachery</button>
+              <button class="btn btn-sm btn-light border rounded-pill px-3" onclick="filterByStreet(3, this)">Anna Salai 3rd Cross, Guindy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Stats Cards -->
+        <div class="col-lg-5">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="stat-box">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="stat-number" id="stat-total-complaints">15</div>
+                  <i class="bi bi-file-earmark-text text-primary fs-3"></i>
+                </div>
+                <div class="stat-label">Complaints Filed</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-box">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="stat-number text-success" id="stat-resolved">5</div>
+                  <i class="bi bi-check2-circle text-success fs-3"></i>
+                </div>
+                <div class="stat-label">Issues Resolved</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-box">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="stat-number text-warning" id="stat-in-progress">4</div>
+                  <i class="bi bi-arrow-repeat text-warning fs-3"></i>
+                </div>
+                <div class="stat-label">In Progress</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-box">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="stat-number text-info" id="stat-residents">13</div>
+                  <i class="bi bi-people text-info fs-3"></i>
+                </div>
+                <div class="stat-label">Active Residents</div>
+              </div>
+            </div>
+
+            <!-- Announcement Card -->
+            <div class="col-12 mt-2">
+              <div class="card border-primary-subtle bg-primary-subtle p-3 rounded-4">
+                <div class="d-flex align-items-start gap-3">
+                  <div class="p-2 bg-white rounded-circle text-primary shadow-sm">
+                    <i class="bi bi-bell-fill fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold text-dark mb-1">Official Street Notice</h6>
+                    <p class="small text-muted mb-0" id="hero-announcement-text">
+                      Tambaram municipality health squad will conduct mosquito fogging and street spraying this Saturday morning 7 AM.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- How It Works Section -->
+  <section class="py-5 bg-white border-bottom">
+    <div class="container">
+      <div class="text-center max-w-xl mx-auto mb-5">
+        <span class="text-primary fw-bold text-uppercase small">Simple &amp; Transparent</span>
+        <h2 class="fw-bold text-dark mt-1">How StreetConnect Works</h2>
+        <p class="text-muted">A collaborative 5-step lifecycle bringing swift civic action to your doorstep</p>
+      </div>
+
+      <div class="row g-4 text-center">
+        <div class="col-md-2 col-6">
+          <div class="p-3">
+            <div class="rounded-circle bg-primary-subtle text-primary mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 58px; height: 58px;">
+              <i class="bi bi-geo-alt-fill fs-4"></i>
+            </div>
+            <h6 class="fw-bold">1. Join Street</h6>
+            <p class="small text-muted">Register and connect with your immediate locality.</p>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="p-3">
+            <div class="rounded-circle bg-danger-subtle text-danger mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 58px; height: 58px;">
+              <i class="bi bi-camera-fill fs-4"></i>
+            </div>
+            <h6 class="fw-bold">2. Post Issue</h6>
+            <p class="small text-muted">Snap a photo and describe the problem in seconds.</p>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="p-3">
+            <div class="rounded-circle bg-warning-subtle text-warning mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 58px; height: 58px;">
+              <i class="bi bi-hand-thumbs-up-fill fs-4"></i>
+            </div>
+            <h6 class="fw-bold">3. Neighbors Upvote</h6>
+            <p class="small text-muted">Neighbors support and comment to raise urgency.</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="p-3">
+            <div class="rounded-circle bg-info-subtle text-info mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 58px; height: 58px;">
+              <i class="bi bi-shield-check fs-4"></i>
+            </div>
+            <h6 class="fw-bold">4. Moderator Reviews</h6>
+            <p class="small text-muted">Official remarks and department dispatch logged.</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-12">
+          <div class="p-3">
+            <div class="rounded-circle bg-success-subtle text-success mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 58px; height: 58px;">
+              <i class="bi bi-check-all fs-3"></i>
+            </div>
+            <h6 class="fw-bold">5. Verified Resolution</h6>
+            <p class="small text-muted">Marked resolved with notes and transparency for all.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Street Complaints Section -->
+  <main class="py-5" id="complaints-section">
+    <div class="container">
+      
+      <!-- Section Header & Filter Controls -->
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+          <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-pin-map text-danger me-2"></i>Community Complaint Feed
+          </h2>
+          <p class="text-muted mb-0" id="feed-subtitle">Showing active issues across all streets</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a href="/pages/create-complaint.html" class="btn btn-primary fw-semibold px-3 py-2 rounded-3">
+            <i class="bi bi-plus-circle me-1"></i> Report New Issue
+          </a>
+        </div>
+      </div>
+
+      <!-- Advanced Filter Bar -->
+      <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+        <div class="row g-2 align-items-center">
+          <!-- Search Input -->
+          <div class="col-lg-4 col-md-6">
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" id="filter-search" class="form-control border-start-0" placeholder="Search by title, landmark..." onkeyup="debounceSearch()">
+            </div>
+          </div>
+
+          <!-- Category Filter -->
+          <div class="col-lg-2 col-md-3 col-6">
+            <select id="filter-category" class="form-select" onchange="loadComplaints()">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="col-lg-2 col-md-3 col-6">
+            <select id="filter-status" class="form-select" onchange="loadComplaints()">
+              <option value="">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="UNDER_REVIEW">Under Review</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="RESOLVED">Resolved</option>
+              <option value="REJECTED">Rejected</option>
+            </select>
+          </div>
+
+          <!-- Priority Filter -->
+          <div class="col-lg-2 col-md-3 col-6">
+            <select id="filter-priority" class="form-select" onchange="loadComplaints()">
+              <option value="">All Priorities</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
+          </div>
+
+          <!-- Sort Order -->
+          <div class="col-lg-2 col-md-3 col-6">
+            <select id="filter-sort" class="form-select" onchange="loadComplaints()">
+              <option value="latest">Newest First</option>
+              <option value="most_supported">Most Supported</option>
+              <option value="most_commented">Most Commented</option>
+              <option value="highest_priority">Highest Priority</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Complaints Grid -->
+      <div id="complaints-grid" class="row g-4">
+        <!-- Dynamically rendered complaint cards -->
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="text-muted mt-2">Loading neighborhood complaints...</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white pt-5 pb-4 mt-auto">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <img src="/assets/logo.svg" alt="StreetConnect Logo" width="32" height="32">
+            <h5 class="fw-bold mb-0 text-white">Street<span class="text-primary">Connect</span></h5>
+          </div>
+          <p class="text-secondary small mb-3">
+            StreetConnect is an open community-powered platform uniting residents, moderators, and civic authorities for safer, cleaner, and better neighborhoods.
+          </p>
+          <div class="badge bg-secondary-subtle text-secondary small py-2 px-3 rounded-pill">
+            <i class="bi bi-shield-check text-success me-1"></i> Transparent &amp; Auditable Civic Platform
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <h6 class="fw-bold text-light mb-3">Platform</h6>
+          <ul class="list-unstyled small text-secondary">
+            <li class="mb-2"><a href="/index.html" class="text-secondary text-decoration-none">Home</a></li>
+            <li class="mb-2"><a href="#complaints-section" class="text-secondary text-decoration-none">All Complaints</a></li>
+            <li class="mb-2"><a href="/pages/create-complaint.html" class="text-secondary text-decoration-none">Report Issue</a></li>
+            <li class="mb-2"><a href="/pages/community.html" class="text-secondary text-decoration-none">Community Board</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <h6 class="fw-bold text-light mb-3">Dashboards</h6>
+          <ul class="list-unstyled small text-secondary">
+            <li class="mb-2"><a href="/pages/my-complaints.html" class="text-secondary text-decoration-none">Resident Feed</a></li>
+            <li class="mb-2"><a href="/pages/moderator.html" class="text-secondary text-decoration-none">Street Moderator</a></li>
+            <li class="mb-2"><a href="/pages/admin.html" class="text-secondary text-decoration-none">Admin Console</a></li>
+            <li class="mb-2"><a href="/pages/profile.html" class="text-secondary text-decoration-none">User Profile</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <h6 class="fw-bold text-light mb-3">Quick Demo Credentials</h6>
+          <div class="bg-secondary bg-opacity-10 p-3 rounded-3 small">
+            <div class="mb-2"><strong class="text-info">Resident:</strong> <code>arun.prakash@gmail.com</code> / <code>password123</code></div>
+            <div class="mb-2"><strong class="text-primary">Moderator:</strong> <code>mod.tambaram@streetconnect.com</code> / <code>password123</code></div>
+            <div><strong class="text-danger">Admin:</strong> <code>admin@streetconnect.com</code> / <code>admin123</code></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="border-secondary my-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center small text-secondary">
+        <div>&copy; 2026 StreetConnect Inc. All rights reserved. Built with Java Spring Boot &amp; MySQL.</div>
+        <div>
+          Tagline: <em>“Your Street. Your Voice. Your Community.”</em>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- App JS Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    let currentSelectedStreetId = null;
+    let searchTimeout = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Set user's street as default if logged in
+      const user = Auth.getUser();
+      if (user && user.street) {
+        currentSelectedStreetId = user.street.id;
+        document.getElementById('feed-subtitle').textContent = `Showing issues for ${user.street.name}, ${user.street.area}`;
+      }
+
+      await loadCategories();
+      await loadComplaints();
+      await loadStats();
+    });
+
+    function debounceSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        loadComplaints();
+      }, 350);
+    }
+
+    function filterByStreet(streetId, btn) {
+      currentSelectedStreetId = streetId;
+      document.querySelectorAll('#hero-street-pills button').forEach(b => b.classList.remove('active', 'btn-primary'));
+      if (btn) {
+        btn.classList.add('active', 'btn-primary');
+        btn.classList.remove('btn-light');
+      }
+
+      const text = streetId ? `Filtered by ${btn.textContent}` : 'Showing active issues across all streets';
+      document.getElementById('feed-subtitle').textContent = text;
+      loadComplaints();
+    }
+
+    async function loadCategories() {
+      try {
+        const res = await Api.get('/categories');
+        if (res && res.data) {
+          const select = document.getElementById('filter-category');
+          res.data.forEach(c => {
+            select.insertAdjacentHTML('beforeend', `<option value="${c.id}">${c.name}</option>`);
+          });
+        }
+      } catch (e) {
+        console.error('Failed to load categories', e);
+      }
+    }
+
+    async function loadStats() {
+      try {
+        const res = await Api.get('/complaints');
+        if (res && res.data) {
+          const total = res.data.length;
+          const resolved = res.data.filter(c => c.status === 'RESOLVED').length;
+          const inProgress = res.data.filter(c => c.status === 'IN_PROGRESS' || c.status === 'UNDER_REVIEW').length;
+          document.getElementById('stat-total-complaints').textContent = total;
+          document.getElementById('stat-resolved').textContent = resolved;
+          document.getElementById('stat-in-progress').textContent = inProgress;
+        }
+      } catch {}
+    }
+
+    async function loadComplaints() {
+      const grid = document.getElementById('complaints-grid');
+      grid.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="text-muted mt-2">Loading complaints...</p>
+        </div>
+      `;
+
+      const params = {
+        streetId: currentSelectedStreetId || '',
+        categoryId: document.getElementById('filter-category').value,
+        status: document.getElementById('filter-status').value,
+        priority: document.getElementById('filter-priority').value,
+        search: document.getElementById('filter-search').value,
+        sortBy: document.getElementById('filter-sort').value
+      };
+
+      try {
+        const res = await Api.get('/complaints', params);
+        if (!res.data || res.data.length === 0) {
+          grid.innerHTML = `
+            <div class="col-12">
+              <div class="empty-state bg-white rounded-4 shadow-sm p-5 border">
+                <i class="bi bi-inbox empty-icon"></i>
+                <h4 class="fw-bold text-dark">No complaints found</h4>
+                <p class="text-muted mb-4">No issues match the selected street or filter criteria. Be the first to report!</p>
+                <a href="/pages/create-complaint.html" class="btn btn-primary px-4 py-2 rounded-3">
+                  <i class="bi bi-megaphone me-1"></i> Report an Issue
+                </a>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = res.data.map(c => renderComplaintCard(c)).join('');
+      } catch (err) {
+        grid.innerHTML = `
+          <div class="col-12 text-center py-5 text-danger">
+            <i class="bi bi-exclamation-triangle fs-1"></i>
+            <p class="mt-2">Failed to load complaints: ${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderComplaintCard(c) {
+      const imgHtml = c.imageUrl
+        ? `<a href="/pages/complaint-detail.html?id=${c.id}"><img src="${c.imageUrl}" class="complaint-thumbnail" alt="${c.title}" onerror="this.style.display='none'"></a>`
+        : `<div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 120px;"><i class="bi bi-camera-fill fs-2 opacity-50"></i></div>`;
+
+      const userAvatar = (c.user && c.user.profileImage)
+        ? c.user.profileImage
+        : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+
+      const userName = c.user ? c.user.fullName : 'Resident';
+      const streetName = c.street ? `${c.street.name}, ${c.street.area}` : 'Street';
+
+      return `
+        <div class="col-lg-4 col-md-6 fade-in">
+          <div class="sc-card card-hoverable h-100 d-flex flex-column">
+            ${imgHtml}
+            <div class="sc-card-body flex-grow-1">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="badge-category"><i class="bi ${c.category.icon || 'bi-tag'}"></i> ${c.category.name}</span>
+                ${App.getPriorityBadge(c.priority)}
+              </div>
+
+              <h5 class="complaint-title">
+                <a href="/pages/complaint-detail.html?id=${c.id}">${c.title}</a>
+              </h5>
+
+              <p class="small text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                ${c.description}
+              </p>
+
+              <div class="complaint-meta mb-3">
+                <span><i class="bi bi-geo-alt text-danger me-1"></i>${streetName}</span>
+                ${c.landmark ? `<span class="text-truncate" style="max-width:140px;" title="${c.landmark}"><i class="bi bi-compass me-1"></i>${c.landmark}</span>` : ''}
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                <div class="d-flex align-items-center gap-2">
+                  <img src="${userAvatar}" class="user-avatar-sm" alt="${userName}">
+                  <div class="small">
+                    <div class="fw-semibold text-dark text-truncate" style="max-width:110px;">${userName}</div>
+                    <div class="text-muted" style="font-size:0.75rem;">${App.timeAgo(c.createdAt)}</div>
+                  </div>
+                </div>
+                <div>
+                  ${App.getStatusBadge(c.status)}
+                </div>
+              </div>
+            </div>
+
+            <div class="sc-card-footer d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <button class="btn-support ${c.supportedByCurrentUser ? 'active' : ''}" id="sup-btn-${c.id}" onclick="handleCardSupport(${c.id})">
+                  <i class="bi ${c.supportedByCurrentUser ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'}"></i>
+                  <span id="sup-count-${c.id}">${c.supportsCount}</span>
+                </button>
+                <a href="/pages/complaint-detail.html?id=${c.id}#comments-section" class="btn btn-sm btn-light border rounded-pill px-3 text-secondary text-decoration-none">
+                  <i class="bi bi-chat-left-text me-1"></i> ${c.commentsCount}
+                </a>
+              </div>
+              <a href="/pages/complaint-detail.html?id=${c.id}" class="btn btn-sm btn-link text-primary text-decoration-none fw-semibold">
+                View Details &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function handleCardSupport(complaintId) {
+      if (!Auth.isLoggedIn()) {
+        const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+        modal.show();
+        return;
+      }
+
+      try {
+        const res = await Api.post(`/complaints/${complaintId}/support`);
+        const btn = document.getElementById(`sup-btn-${complaintId}`);
+        const countSpan = document.getElementById(`sup-count-${complaintId}`);
+        if (res.data) {
+          countSpan.textContent = res.data.supportsCount;
+          if (res.data.supported) {
+            btn.classList.add('active');
+            btn.querySelector('i').className = 'bi bi-hand-thumbs-up-fill';
+          } else {
+            btn.classList.remove('active');
+            btn.querySelector('i').className = 'bi bi-hand-thumbs-up';
+          }
+        }
+      } catch (err) {
+        App.showToast(err.message || 'Could not register support', 'danger');
+      }
+    }
+  </script>
+</body>
+</html>

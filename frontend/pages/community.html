@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Hub &amp; Civic Statistics — StreetConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-expand-lg sc-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/index.html">
+        <img src="/assets/logo.svg" alt="StreetConnect Logo" width="36" height="36">
+        <span>Street<span class="text-primary">Connect</span></span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#scNavContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="scNavContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          <li class="nav-item"><a class="nav-link" href="/index.html"><i class="bi bi-house-door"></i> Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/index.html#complaints-section"><i class="bi bi-card-list"></i> Complaints</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/my-complaints.html"><i class="bi bi-collection"></i> My Complaints</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/pages/community.html"><i class="bi bi-people"></i> Community</a></li>
+        </ul>
+
+        <div id="navbar-auth-section" class="d-flex align-items-center gap-2"></div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="py-5">
+    <div class="container">
+
+      <!-- Header -->
+      <div class="text-center max-w-xl mx-auto mb-5">
+        <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill mb-2">
+          <i class="bi bi-graph-up-arrow me-1"></i> Civic Transparency &amp; Community Board
+        </span>
+        <h2 class="fw-bold text-dark">StreetConnect Community Hub</h2>
+        <p class="text-muted">
+          Real-time neighborhood metrics, official public works notices, top-voted resident concerns, and resolved victories.
+        </p>
+      </div>
+
+      <!-- Civic Analytics Row (Chart.js) -->
+      <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+          <div class="sc-card p-4 h-100">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-pie-chart text-primary me-2"></i>Issues by Category</h5>
+            <div style="height: 280px; position: relative;">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="sc-card p-4 h-100">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-bar-chart text-success me-2"></i>Complaint Resolution Status</h5>
+            <div style="height: 280px; position: relative;">
+              <canvas id="statusChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Announcements & Leaderboard Row -->
+      <div class="row g-4 mb-5">
+        
+        <!-- Left: Official Announcements -->
+        <div class="col-lg-7">
+          <div class="sc-card p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-megaphone text-danger me-2"></i>Community &amp; Ward Announcements
+              </h5>
+              <span class="badge bg-danger-subtle text-danger small">Verified Notices</span>
+            </div>
+            
+            <div id="announcements-container" class="d-flex flex-column gap-3">
+              <div class="text-center py-4 text-muted">Loading announcements...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Most Supported Complaints Leaderboard -->
+        <div class="col-lg-5">
+          <div class="sc-card p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-fire text-warning me-2"></i>Top Supported Issues
+              </h5>
+              <span class="badge bg-warning-subtle text-warning small">High Priority</span>
+            </div>
+
+            <div id="top-supported-container" class="d-flex flex-column gap-3">
+              <div class="text-center py-4 text-muted">Loading leaderboard...</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Recently Resolved Victories Showcase -->
+      <div class="sc-card p-4 p-md-5 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark mb-1">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>Recently Resolved Issues
+            </h4>
+            <p class="text-muted small mb-0">Problems reported by residents that have been officially fixed and certified.</p>
+          </div>
+          <span class="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill">
+            Verified Completed
+          </span>
+        </div>
+
+        <div class="row g-3" id="recently-resolved-grid">
+          <div class="col-12 text-center py-4 text-muted">Loading resolved issues...</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadAnalyticsCharts();
+      await loadAnnouncements();
+      await loadTopSupported();
+      await loadRecentlyResolved();
+    });
+
+    async function loadAnalyticsCharts() {
+      try {
+        const res = await Api.get('/complaints');
+        const complaints = res.data || [];
+
+        // Category aggregation
+        const catCounts = {};
+        complaints.forEach(c => {
+          const cat = c.category ? c.category.name : 'Other';
+          catCounts[cat] = (catCounts[cat] || 0) + 1;
+        });
+
+        // Status aggregation
+        const statusCounts = {
+          'PENDING': 0,
+          'UNDER_REVIEW': 0,
+          'IN_PROGRESS': 0,
+          'RESOLVED': 0,
+          'REJECTED': 0
+        };
+        complaints.forEach(c => {
+          if (statusCounts[c.status] !== undefined) {
+            statusCounts[c.status]++;
+          }
+        });
+
+        // Render Category Doughnut Chart
+        new Chart(document.getElementById('categoryChart'), {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(catCounts),
+            datasets: [{
+              data: Object.values(catCounts),
+              backgroundColor: [
+                '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
+                '#8b5cf6', '#06b6d4', '#ec4899', '#6366f1', '#64748b'
+              ],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+          }
+        });
+
+        // Render Status Bar Chart
+        new Chart(document.getElementById('statusChart'), {
+          type: 'bar',
+          data: {
+            labels: ['Pending', 'Under Review', 'In Progress', 'Resolved', 'Rejected'],
+            datasets: [{
+              label: 'Complaints',
+              data: [
+                statusCounts['PENDING'],
+                statusCounts['UNDER_REVIEW'],
+                statusCounts['IN_PROGRESS'],
+                statusCounts['RESOLVED'],
+                statusCounts['REJECTED']
+              ],
+              backgroundColor: ['#f59e0b', '#8b5cf6', '#3b82f6', '#10b981', '#ef4444'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            },
+            plugins: {
+              legend: { display: false }
+            }
+          }
+        });
+
+      } catch (err) {
+        console.error('Failed to load charts', err);
+      }
+    }
+
+    async function loadAnnouncements() {
+      const container = document.getElementById('announcements-container');
+      try {
+        const res = await Api.get('/announcements');
+        const list = res.data || [];
+        if (list.length === 0) {
+          container.innerHTML = `<div class="text-center py-4 text-muted small">No active announcements</div>`;
+          return;
+        }
+
+        container.innerHTML = list.map(a => `
+          <div class="p-3 rounded-3 border bg-light">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span class="badge ${a.priority === 'IMPORTANT' ? 'bg-danger' : 'bg-primary'} small">${a.priority}</span>
+              <span class="small text-muted">${App.timeAgo(a.createdAt)}</span>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">${a.title}</h6>
+            <p class="small text-muted mb-2">${a.content}</p>
+            <div class="small text-primary">
+              <i class="bi bi-geo-alt"></i> ${a.streetName ? a.streetName : 'Global (All Streets)'}
+              ${a.createdByName ? ` &bull; By <strong>${a.createdByName}</strong>` : ''}
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = `<div class="text-danger small">Failed to load notices</div>`;
+      }
+    }
+
+    async function loadTopSupported() {
+      const container = document.getElementById('top-supported-container');
+      try {
+        const res = await Api.get('/complaints', { sortBy: 'most_supported' });
+        const list = (res.data || []).slice(0, 5);
+
+        container.innerHTML = list.map((c, i) => `
+          <div class="d-flex align-items-center gap-3 p-2 rounded-3 border-bottom">
+            <div class="fs-4 fw-bold text-muted" style="width: 24px;">#${i + 1}</div>
+            <div class="flex-grow-1 text-truncate">
+              <a href="/pages/complaint-detail.html?id=${c.id}" class="text-dark fw-bold small text-decoration-none d-block text-truncate">
+                ${c.title}
+              </a>
+              <div class="small text-muted">
+                <i class="bi bi-geo-alt text-danger"></i> ${c.street ? c.street.name : ''}
+              </div>
+            </div>
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+              👍 ${c.supportsCount}
+            </span>
+          </div>
+        `).join('');
+      } catch {
+        container.innerHTML = `<div class="text-danger small">Failed to load leaderboard</div>`;
+      }
+    }
+
+    async function loadRecentlyResolved() {
+      const grid = document.getElementById('recently-resolved-grid');
+      try {
+        const res = await Api.get('/complaints', { status: 'RESOLVED' });
+        const list = (res.data || []).slice(0, 4);
+
+        if (list.length === 0) {
+          grid.innerHTML = `<div class="col-12 text-center text-muted py-4">No resolved issues yet.</div>`;
+          return;
+        }
+
+        grid.innerHTML = list.map(c => `
+          <div class="col-md-6">
+            <div class="p-3 rounded-4 border bg-success-subtle h-100 d-flex flex-column justify-content-between">
+              <div>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="badge bg-success text-white small"><i class="bi bi-check-circle"></i> RESOLVED</span>
+                  <span class="small text-muted">${c.resolvedAt ? App.timeAgo(c.resolvedAt) : App.timeAgo(c.updatedAt)}</span>
+                </div>
+                <h6 class="fw-bold text-dark mb-1">
+                  <a href="/pages/complaint-detail.html?id=${c.id}" class="text-dark text-decoration-none">${c.title}</a>
+                </h6>
+                <p class="small text-muted mb-2 text-truncate">${c.description}</p>
+                ${c.resolutionNotes ? `
+                  <div class="small bg-white p-2 rounded-2 border text-success fw-semibold">
+                    <i class="bi bi-patch-check"></i> ${c.resolutionNotes}
+                  </div>
+                ` : ''}
+              </div>
+              <div class="pt-2 mt-2 border-top d-flex justify-content-between align-items-center small text-muted">
+                <span><i class="bi bi-geo-alt"></i> ${c.street ? c.street.name : ''}</span>
+                <a href="/pages/complaint-detail.html?id=${c.id}" class="text-primary text-decoration-none fw-semibold">View Case &rarr;</a>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch {
+        grid.innerHTML = `<div class="col-12 text-danger text-center">Failed to load resolved cases</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaint Details — StreetConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-expand-lg sc-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/index.html">
+        <img src="/assets/logo.svg" alt="StreetConnect Logo" width="36" height="36">
+        <span>Street<span class="text-primary">Connect</span></span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#scNavContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="scNavContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          <li class="nav-item">
+            <a class="nav-link" href="/index.html"><i class="bi bi-house-door"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/index.html#complaints-section"><i class="bi bi-card-list"></i> Complaints</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pages/my-complaints.html"><i class="bi bi-collection"></i> My Complaints</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pages/community.html"><i class="bi bi-people"></i> Community</a>
+          </li>
+        </ul>
+
+        <div id="navbar-auth-section" class="d-flex align-items-center gap-2"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="py-4">
+    <div class="container">
+
+      <!-- Breadcrumb & Back -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/index.html" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="/index.html#complaints-section" class="text-decoration-none">Complaints</a></li>
+            <li class="breadcrumb-item active" aria-current="page" id="breadcrumb-id">Issue #</li>
+          </ol>
+        </nav>
+        <a href="/index.html#complaints-section" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+          <i class="bi bi-arrow-left me-1"></i> Back to Complaints
+        </a>
+      </div>
+
+      <!-- Loading State -->
+      <div id="detail-loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2">Loading complaint details...</p>
+      </div>
+
+      <!-- Detail Content Wrapper -->
+      <div id="detail-content" class="row g-4 d-none">
+        
+        <!-- Left Column: Complaint Details & Comments -->
+        <div class="col-lg-8">
+          
+          <!-- Complaint Main Card -->
+          <div class="sc-card p-4 mb-4">
+            
+            <!-- Category, Priority & Action Badges -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge-category" id="c-category"><i class="bi bi-tag"></i> Category</span>
+                <span id="c-priority"></span>
+              </div>
+              <div id="c-status"></div>
+            </div>
+
+            <!-- Title -->
+            <h2 class="fw-bold text-dark mb-3" id="c-title">Complaint Title</h2>
+
+            <!-- Metadata info bar -->
+            <div class="d-flex flex-wrap align-items-center gap-3 py-2 px-3 bg-light rounded-3 mb-4 small text-muted">
+              <span><i class="bi bi-geo-alt text-danger me-1"></i><strong id="c-street">Street</strong></span>
+              <span id="c-landmark-box"><i class="bi bi-compass text-primary me-1"></i><span id="c-landmark">Landmark</span></span>
+              <span><i class="bi bi-clock me-1"></i>Filed <span id="c-timeago">Just now</span></span>
+              <span id="c-contact-box" class="d-none"><i class="bi bi-telephone text-success me-1"></i><span id="c-contact"></span></span>
+            </div>
+
+            <!-- Image display -->
+            <div id="c-image-container" class="mb-4 d-none">
+              <img id="c-image" src="" alt="Complaint Photo" class="img-fluid rounded-4 shadow-sm w-100" style="max-height: 480px; object-fit: cover; cursor: pointer;" onclick="openImageLightbox(this.src)">
+              <div class="small text-muted mt-1 text-center"><i class="bi bi-zoom-in"></i> Click image to view full resolution</div>
+            </div>
+
+            <!-- Full Description -->
+            <div class="mb-4">
+              <h5 class="fw-bold text-dark mb-2">Detailed Description</h5>
+              <div class="p-3 bg-body-tertiary rounded-3" style="line-height: 1.7; font-size: 1.05rem;" id="c-description">
+                Description goes here...
+              </div>
+            </div>
+
+            <!-- Official Remark / Resolution note callout -->
+            <div id="c-official-remark-card" class="card border-primary-subtle bg-primary-subtle p-3 rounded-4 mb-4 d-none">
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-patch-check-fill text-primary fs-4"></i>
+                <div>
+                  <h6 class="fw-bold text-primary mb-1">Official Municipality Remark</h6>
+                  <p class="mb-0 text-dark small" id="c-official-remark"></p>
+                  <p class="mb-0 text-muted small mt-2 d-none" id="c-resolution-notes-box">
+                    <strong>Resolution Note:</strong> <span id="c-resolution-notes"></span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons: Support, Share, Report -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+              <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-support px-4 py-2" id="detail-support-btn" onclick="toggleDetailSupport()">
+                  <i class="bi bi-hand-thumbs-up" id="detail-support-icon"></i>
+                  <span id="detail-support-text">Support</span>
+                  <span class="badge bg-secondary-subtle text-dark ms-1" id="detail-support-count">0</span>
+                </button>
+
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2" onclick="shareComplaint()">
+                  <i class="bi bi-share me-1"></i> Share
+                </button>
+              </div>
+
+              <div>
+                <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2" onclick="openReportModal()">
+                  <i class="bi bi-flag me-1"></i> Report Issue
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Comments Section -->
+          <div class="sc-card p-4" id="comments-section">
+            <h4 class="fw-bold text-dark mb-3 d-flex align-items-center justify-content-between">
+              <span><i class="bi bi-chat-left-dots text-primary me-2"></i>Community Comments (<span id="comments-count">0</span>)</span>
+            </h4>
+
+            <!-- Add Comment Form -->
+            <div class="mb-4">
+              <div class="d-flex gap-3 align-items-start">
+                <img id="current-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="user-avatar-md rounded-circle border" alt="User">
+                <div class="flex-grow-1">
+                  <textarea id="comment-input" class="form-control rounded-3" rows="3" placeholder="Share your update, verification, or note for neighbors..." maxlength="2000"></textarea>
+                  <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="small text-muted" id="comment-char-count">0 / 2000</span>
+                    <button class="btn btn-primary btn-sm px-4 fw-semibold rounded-pill" id="comment-submit-btn" onclick="submitComment()">
+                      <i class="bi bi-send me-1"></i> Post Comment
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Comments List -->
+            <div id="comments-list" class="d-flex flex-column gap-3">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Status Timeline & Moderator Controls & Author Profile -->
+        <div class="col-lg-4">
+          
+          <!-- Moderator / Admin Action Box -->
+          <div id="moderator-actions-card" class="sc-card p-4 mb-4 border-primary shadow-sm d-none">
+            <div class="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
+              <i class="bi bi-shield-check fs-5"></i>
+              <span>Moderator Controls</span>
+            </div>
+            <p class="small text-muted mb-3">
+              As a street moderator or administrator, you can review this complaint, advance its status, and record official municipality action notes.
+            </p>
+            <button class="btn btn-primary w-100 fw-semibold rounded-3 py-2" data-bs-toggle="modal" data-bs-target="#statusUpdateModal">
+              <i class="bi bi-sliders me-1"></i> Update Status &amp; Remarks
+            </button>
+          </div>
+
+          <!-- Status Timeline Card -->
+          <div class="sc-card p-4 mb-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history text-secondary me-2"></i>Status Progress</h5>
+            
+            <div class="timeline" id="status-timeline">
+              <!-- Timeline items rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Author Info Card -->
+          <div class="sc-card p-4 mb-4">
+            <h6 class="fw-bold text-dark mb-3">Reported By</h6>
+            <div class="d-flex align-items-center gap-3">
+              <img id="author-avatar" src="" class="user-avatar-md rounded-circle border" alt="Author">
+              <div>
+                <h6 class="fw-bold mb-0 text-dark" id="author-name">Resident Name</h6>
+                <div class="small text-muted" id="author-role">Community Resident</div>
+                <div class="small text-primary mt-1" id="author-street"><i class="bi bi-geo-alt"></i> Street</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Street Community Card -->
+          <div class="sc-card p-4 bg-light">
+            <h6 class="fw-bold text-dark mb-2">Street Accountability</h6>
+            <p class="small text-muted mb-3">
+              Complaints posted on StreetConnect are visible to all registered residents of the street and assigned ward moderators for 100% civic transparency.
+            </p>
+            <div class="d-grid">
+              <a href="/index.html#complaints-section" class="btn btn-outline-primary btn-sm rounded-pill">
+                Explore More in This Street
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Moderator Status Update Modal -->
+  <div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-dark"><i class="bi bi-arrow-repeat text-primary me-1"></i> Update Complaint Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="statusUpdateForm" onsubmit="handleStatusUpdate(event)">
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">New Status *</label>
+              <select id="modal-new-status" class="form-select" required>
+                <option value="PENDING">PENDING</option>
+                <option value="UNDER_REVIEW">UNDER REVIEW</option>
+                <option value="IN_PROGRESS">IN PROGRESS</option>
+                <option value="RESOLVED">RESOLVED</option>
+                <option value="REJECTED">REJECTED</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Official Remark (Visible to residents)</label>
+              <textarea id="modal-official-remark" class="form-control" rows="3" placeholder="e.g. Field inspection completed. Work order dispatched to department."></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Resolution Notes (If resolved)</label>
+              <textarea id="modal-resolution-notes" class="form-control" rows="2" placeholder="e.g. Silt cleared, new iron manhole cover sealed safely."></textarea>
+            </div>
+            <button type="submit" id="statusUpdateSubmitBtn" class="btn btn-primary w-100 py-2 fw-semibold rounded-3">
+              Save &amp; Notify Residents
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Complaint Modal -->
+  <div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-danger"><i class="bi bi-flag-fill me-1"></i> Report Inappropriate Content</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="small text-muted">
+            If this complaint contains spam, abusive language, or non-civic private disputes, please describe the violation for the moderation team.
+          </p>
+          <form id="reportForm" onsubmit="submitReport(event)">
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Reason for Report *</label>
+              <textarea id="report-reason" class="form-control" rows="3" placeholder="Please provide specific details..." required minlength="5"></textarea>
+            </div>
+            <button type="submit" id="reportSubmitBtn" class="btn btn-danger w-100 py-2 fw-semibold rounded-3">
+              Submit Report to Moderator
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content bg-transparent border-0">
+        <div class="modal-header border-0 pb-0">
+          <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center p-0">
+          <img id="lightbox-img" src="" class="img-fluid rounded-4 shadow-lg" alt="Full Resolution Image" style="max-height: 85vh;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    let complaintId = null;
+    let complaintData = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      complaintId = urlParams.get('id');
+
+      if (!complaintId) {
+        window.location.href = '/index.html';
+        return;
+      }
+
+      document.getElementById('breadcrumb-id').textContent = `Issue #${complaintId}`;
+
+      // Character count listener
+      const commentInput = document.getElementById('comment-input');
+      commentInput.addEventListener('input', () => {
+        document.getElementById('comment-char-count').textContent = `${commentInput.value.length} / 2000`;
+      });
+
+      // Update current user avatar in comment form
+      const user = Auth.getUser();
+      if (user && user.profileImage) {
+        document.getElementById('current-user-avatar').src = user.profileImage;
+      }
+
+      await loadComplaintDetails();
+      await loadComments();
+      await loadStatusHistory();
+    });
+
+    async function loadComplaintDetails() {
+      try {
+        const res = await Api.get(`/complaints/${complaintId}`);
+        complaintData = res.data;
+
+        document.getElementById('detail-loading').classList.add('d-none');
+        document.getElementById('detail-content').classList.remove('d-none');
+
+        document.title = `${complaintData.title} — StreetConnect`;
+        document.getElementById('c-title').textContent = complaintData.title;
+        document.getElementById('c-description').textContent = complaintData.description;
+        
+        // Category
+        document.getElementById('c-category').innerHTML = `<i class="bi ${complaintData.category.icon || 'bi-tag'}"></i> ${complaintData.category.name}`;
+        // Priority
+        document.getElementById('c-priority').innerHTML = App.getPriorityBadge(complaintData.priority);
+        // Status
+        document.getElementById('c-status').innerHTML = App.getStatusBadge(complaintData.status);
+
+        // Location & Landmark
+        const streetStr = complaintData.street ? `${complaintData.street.name}, ${complaintData.street.area} (${complaintData.street.city})` : 'Street';
+        document.getElementById('c-street').textContent = streetStr;
+
+        if (complaintData.landmark) {
+          document.getElementById('c-landmark').textContent = complaintData.landmark;
+          document.getElementById('c-landmark-box').classList.remove('d-none');
+        } else {
+          document.getElementById('c-landmark-box').classList.add('d-none');
+        }
+
+        document.getElementById('c-timeago').textContent = App.timeAgo(complaintData.createdAt);
+
+        if (complaintData.contactNumber) {
+          document.getElementById('c-contact').textContent = complaintData.contactNumber;
+          document.getElementById('c-contact-box').classList.remove('d-none');
+        }
+
+        // Image
+        if (complaintData.imageUrl) {
+          document.getElementById('c-image').src = complaintData.imageUrl;
+          document.getElementById('c-image-container').classList.remove('d-none');
+        }
+
+        // Official Remark
+        if (complaintData.officialRemark) {
+          document.getElementById('c-official-remark').textContent = complaintData.officialRemark;
+          document.getElementById('c-official-remark-card').classList.remove('d-none');
+          if (complaintData.resolutionNotes) {
+            document.getElementById('c-resolution-notes').textContent = complaintData.resolutionNotes;
+            document.getElementById('c-resolution-notes-box').classList.remove('d-none');
+          }
+        }
+
+        // Supports
+        updateSupportUI(complaintData.supportedByCurrentUser, complaintData.supportsCount);
+
+        // Author Card
+        const author = complaintData.user;
+        if (author) {
+          document.getElementById('author-name').textContent = author.fullName;
+          document.getElementById('author-role').textContent = author.role.replace('ROLE_', '');
+          document.getElementById('author-street').innerHTML = `<i class="bi bi-geo-alt"></i> ${author.street ? author.street.name : streetStr}`;
+          if (author.profileImage) {
+            document.getElementById('author-avatar').src = author.profileImage;
+          }
+        }
+
+        // Moderator Controls Visibility
+        if (Auth.isModerator() || Auth.isAdmin()) {
+          document.getElementById('moderator-actions-card').classList.remove('d-none');
+          document.getElementById('modal-new-status').value = complaintData.status;
+          document.getElementById('modal-official-remark').value = complaintData.officialRemark || '';
+          document.getElementById('modal-resolution-notes').value = complaintData.resolutionNotes || '';
+        }
+
+      } catch (err) {
+        document.getElementById('detail-loading').innerHTML = `
+          <div class="text-danger py-5">
+            <i class="bi bi-exclamation-octagon fs-1"></i>
+            <h4 class="mt-2">Complaint Not Found</h4>
+            <p class="text-muted">${err.message}</p>
+            <a href="/index.html" class="btn btn-primary rounded-pill px-4 mt-2">Return to Home</a>
+          </div>
+        `;
+      }
+    }
+
+    function updateSupportUI(supported, count) {
+      const btn = document.getElementById('detail-support-btn');
+      const icon = document.getElementById('detail-support-icon');
+      const countSpan = document.getElementById('detail-support-count');
+      const textSpan = document.getElementById('detail-support-text');
+
+      countSpan.textContent = count;
+      if (supported) {
+        btn.classList.add('active');
+        icon.className = 'bi bi-hand-thumbs-up-fill';
+        textSpan.textContent = 'Supported';
+      } else {
+        btn.classList.remove('active');
+        icon.className = 'bi bi-hand-thumbs-up';
+        textSpan.textContent = 'Support';
+      }
+    }
+
+    async function toggleDetailSupport() {
+      if (!Auth.isLoggedIn()) {
+        const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+        modal.show();
+        return;
+      }
+      try {
+        const res = await Api.post(`/complaints/${complaintId}/support`);
+        if (res.data) {
+          updateSupportUI(res.data.supported, res.data.supportsCount);
+          App.showToast(res.message, 'success');
+        }
+      } catch (err) {
+        App.showToast(err.message || 'Support action failed', 'danger');
+      }
+    }
+
+    async function loadStatusHistory() {
+      const timelineEl = document.getElementById('status-timeline');
+      try {
+        const res = await Api.get(`/complaints/${complaintId}/history`);
+        if (!res.data || res.data.length === 0) {
+          timelineEl.innerHTML = `<div class="small text-muted">No status logs recorded yet.</div>`;
+          return;
+        }
+
+        timelineEl.innerHTML = res.data.map((h, index) => {
+          const isResolved = h.newStatus === 'RESOLVED';
+          const isLast = index === res.data.length - 1;
+          const markerClass = isResolved ? 'resolved' : (isLast ? 'active' : '');
+
+          return `
+            <div class="timeline-item ${markerClass}">
+              <div class="timeline-marker"></div>
+              <div class="timeline-title">${h.newStatus.replace('_', ' ')}</div>
+              <div class="timeline-meta">
+                <span><i class="bi bi-clock"></i> ${App.formatDate(h.createdAt)}</span>
+                ${h.changedByName ? ` &bull; By <strong>${h.changedByName}</strong> (${h.changedByRole ? h.changedByRole.replace('ROLE_', '') : ''})` : ''}
+              </div>
+              ${h.remark ? `<div class="timeline-remark">${h.remark}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        timelineEl.innerHTML = `<div class="text-danger small">Failed to load history</div>`;
+      }
+    }
+
+    async function handleStatusUpdate(e) {
+      e.preventDefault();
+      const btn = document.getElementById('statusUpdateSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Saving...`;
+
+      const payload = {
+        status: document.getElementById('modal-new-status').value,
+        officialRemark: document.getElementById('modal-official-remark').value,
+        resolutionNotes: document.getElementById('modal-resolution-notes').value
+      };
+
+      try {
+        await Api.put(`/complaints/${complaintId}/status`, payload);
+        const modalEl = document.getElementById('statusUpdateModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+
+        App.showToast('Status updated successfully!', 'success');
+        await loadComplaintDetails();
+        await loadStatusHistory();
+      } catch (err) {
+        App.showToast(err.message || 'Status update failed', 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `Save &amp; Notify Residents`;
+      }
+    }
+
+    async function loadComments() {
+      const listEl = document.getElementById('comments-list');
+      try {
+        const res = await Api.get(`/complaints/${complaintId}/comments`);
+        const comments = res.data || [];
+        document.getElementById('comments-count').textContent = comments.length;
+
+        if (comments.length === 0) {
+          listEl.innerHTML = `
+            <div class="text-center py-4 text-muted bg-light rounded-3">
+              <i class="bi bi-chat-square-text fs-3 opacity-50 d-block mb-1"></i>
+              No comments yet. Be the first to share an update!
+            </div>
+          `;
+          return;
+        }
+
+        listEl.innerHTML = comments.map(c => {
+          const avatar = (c.user && c.user.profileImage)
+            ? c.user.profileImage
+            : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+          const name = c.user ? c.user.fullName : 'Neighbor';
+          const role = c.user ? c.user.role : '';
+          const roleBadge = role === 'ROLE_MODERATOR' ? '<span class="badge bg-primary ms-1" style="font-size:0.65rem;">MODERATOR</span>'
+            : role === 'ROLE_ADMIN' ? '<span class="badge bg-danger ms-1" style="font-size:0.65rem;">ADMIN</span>' : '';
+
+          const canDelete = c.owner || Auth.isAdmin() || Auth.isModerator();
+
+          return `
+            <div class="d-flex gap-3 align-items-start fade-in" id="comment-row-${c.id}">
+              <img src="${avatar}" class="user-avatar-sm" alt="${name}">
+              <div class="flex-grow-1">
+                <div class="comment-bubble">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <div>
+                      <strong class="text-dark small">${name}</strong>
+                      ${roleBadge}
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted" style="font-size: 0.75rem;">${App.timeAgo(c.createdAt)}</span>
+                      ${canDelete ? `<button class="btn btn-sm btn-link text-danger p-0 text-decoration-none" title="Delete comment" onclick="deleteComment(${c.id})"><i class="bi bi-trash"></i></button>` : ''}
+                    </div>
+                  </div>
+                  <div class="text-secondary small" style="white-space: pre-wrap;">${c.content}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        listEl.innerHTML = `<div class="text-danger small">Failed to load comments</div>`;
+      }
+    }
+
+    async function submitComment() {
+      if (!Auth.isLoggedIn()) {
+        const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+        modal.show();
+        return;
+      }
+
+      const input = document.getElementById('comment-input');
+      const text = input.value.trim();
+      if (!text) {
+        App.showToast('Please type a comment first', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('comment-submit-btn');
+      btn.disabled = true;
+
+      try {
+        await Api.post(`/complaints/${complaintId}/comments`, { content: text });
+        input.value = '';
+        document.getElementById('comment-char-count').textContent = '0 / 2000';
+        App.showToast('Comment posted!', 'success');
+        await loadComments();
+      } catch (err) {
+        App.showToast(err.message || 'Failed to post comment', 'danger');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function deleteComment(id) {
+      if (!confirm('Are you sure you want to delete this comment?')) return;
+      try {
+        await Api.delete(`/comments/${id}`);
+        App.showToast('Comment removed', 'info');
+        document.getElementById(`comment-row-${id}`)?.remove();
+        const countSpan = document.getElementById('comments-count');
+        countSpan.textContent = Math.max(0, parseInt(countSpan.textContent || '1') - 1);
+      } catch (err) {
+        App.showToast(err.message || 'Could not delete comment', 'danger');
+      }
+    }
+
+    function openReportModal() {
+      if (!Auth.isLoggedIn()) {
+        const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+        modal.show();
+        return;
+      }
+      const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+      modal.show();
+    }
+
+    async function submitReport(e) {
+      e.preventDefault();
+      const btn = document.getElementById('reportSubmitBtn');
+      btn.disabled = true;
+
+      const reason = document.getElementById('report-reason').value;
+      try {
+        await Api.post(`/complaints/${complaintId}/report`, { reason });
+        const modalEl = document.getElementById('reportModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+        App.showToast('Report submitted for moderation review. Thank you.', 'info');
+      } catch (err) {
+        App.showToast(err.message || 'Report failed', 'danger');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function openImageLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      const modal = new bootstrap.Modal(document.getElementById('lightboxModal'));
+      modal.show();
+    }
+
+    function shareComplaint() {
+      if (navigator.share) {
+        navigator.share({
+          title: complaintData ? complaintData.title : 'StreetConnect Issue',
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        App.showToast('Link copied to clipboard!', 'info');
+      }
+    }
+  </script>
+</body>
+</html>

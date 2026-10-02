@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Command Console — StreetConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-expand-lg sc-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/index.html">
+        <img src="/assets/logo.svg" alt="StreetConnect Logo" width="36" height="36">
+        <span>Street<span class="text-primary">Connect</span> <span class="badge bg-danger small ms-1" style="font-size:0.65rem;">ADMIN</span></span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#scNavContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="scNavContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          <li class="nav-item"><a class="nav-link" href="/index.html"><i class="bi bi-house-door"></i> Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/index.html#complaints-section"><i class="bi bi-card-list"></i> Complaints</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/community.html"><i class="bi bi-people"></i> Community</a></li>
+          <li class="nav-item"><a class="nav-link active text-danger fw-bold" href="/pages/admin.html"><i class="bi bi-speedometer2"></i> Admin Console</a></li>
+        </ul>
+
+        <div id="navbar-auth-section" class="d-flex align-items-center gap-2"></div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="py-5">
+    <div class="container">
+
+      <!-- Header -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+          <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-2 rounded-pill mb-1">
+            <i class="bi bi-shield-lock-fill me-1"></i> System Administration
+          </span>
+          <h2 class="fw-bold text-dark mb-0">Platform Overview &amp; Control</h2>
+          <p class="text-muted mb-0">System-wide governance, moderation queues, user directories, and civic metrics.</p>
+        </div>
+
+        <div>
+          <button class="btn btn-outline-primary rounded-3 px-3 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#createStreetModal">
+            <i class="bi bi-plus-lg me-1"></i> Register New Street
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Metrics Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-xl-2 col-md-4 col-6">
+          <div class="stat-box">
+            <div class="stat-number text-dark" id="kpi-total-users">0</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+          <div class="stat-box">
+            <div class="stat-number text-primary" id="kpi-total-streets">0</div>
+            <div class="stat-label">Streets Active</div>
+          </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+          <div class="stat-box">
+            <div class="stat-number text-secondary" id="kpi-total-complaints">0</div>
+            <div class="stat-label">All Issues</div>
+          </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+          <div class="stat-box">
+            <div class="stat-number text-warning" id="kpi-pending">0</div>
+            <div class="stat-label">Pending / Review</div>
+          </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+          <div class="stat-box">
+            <div class="stat-number text-success" id="kpi-resolved">0</div>
+            <div class="stat-label">Resolved</div>
+          </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+          <div class="stat-box">
+            <div class="stat-number text-danger" id="kpi-reports">0</div>
+            <div class="stat-label">Flagged Content</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Charts Row -->
+      <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+          <div class="sc-card p-4 h-100">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-pie-chart text-primary me-2"></i>Issues by Category</h5>
+            <div style="height: 260px; position: relative;">
+              <canvas id="adminCategoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="sc-card p-4 h-100">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-bar-chart-steps text-info me-2"></i>Status Distribution</h5>
+            <div style="height: 260px; position: relative;">
+              <canvas id="adminStatusChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Management Navigation Tabs -->
+      <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3">
+        <li class="nav-item">
+          <button class="nav-link active rounded-pill px-4 fw-semibold" data-bs-toggle="pill" data-bs-target="#admin-tab-complaints">
+            <i class="bi bi-card-checklist me-1"></i> Complaints Management
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link rounded-pill px-4 fw-semibold" data-bs-toggle="pill" data-bs-target="#admin-tab-users">
+            <i class="bi bi-people me-1"></i> Users &amp; Roles
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link rounded-pill px-4 fw-semibold" data-bs-toggle="pill" data-bs-target="#admin-tab-reports">
+            <i class="bi bi-flag-fill text-danger me-1"></i> Content Moderation Queue
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link rounded-pill px-4 fw-semibold" data-bs-toggle="pill" data-bs-target="#admin-tab-streets">
+            <i class="bi bi-geo-alt-fill text-success me-1"></i> Registered Streets
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tab Panes -->
+      <div class="tab-content">
+        
+        <!-- Tab 1: Complaints Management -->
+        <div class="tab-pane fade show active" id="admin-tab-complaints">
+          <div class="sc-card overflow-hidden">
+            <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+              <input type="text" id="admin-complaints-search" class="form-control form-control-sm w-auto" placeholder="Filter complaints..." onkeyup="filterAdminComplaintsTable(this.value)">
+              <span class="small text-muted" id="admin-complaints-total-count">0 complaints</span>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" id="admin-complaints-table">
+                <thead class="table-light small text-uppercase">
+                  <tr>
+                    <th class="ps-3">ID / Title</th>
+                    <th>Street</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Supports</th>
+                    <th class="text-end pe-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-complaints-tbody">
+                  <tr><td colspan="7" class="text-center py-4 text-muted">Loading complaints...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Users Management -->
+        <div class="tab-pane fade" id="admin-tab-users">
+          <div class="sc-card overflow-hidden">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                  <tr>
+                    <th class="ps-3">User</th>
+                    <th>Email &amp; Mobile</th>
+                    <th>Assigned Street</th>
+                    <th>Current Role</th>
+                    <th>Status</th>
+                    <th class="text-end pe-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-tbody">
+                  <tr><td colspan="6" class="text-center py-4 text-muted">Loading user accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Reports Queue -->
+        <div class="tab-pane fade" id="admin-tab-reports">
+          <div class="sc-card overflow-hidden">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                  <tr>
+                    <th class="ps-3">Reported Complaint</th>
+                    <th>Flagged By</th>
+                    <th>Reason</th>
+                    <th>Report Status</th>
+                    <th>Action Notes</th>
+                    <th class="text-end pe-3">Resolution</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-reports-tbody">
+                  <tr><td colspan="6" class="text-center py-4 text-muted">Loading flagged content queue...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Streets List -->
+        <div class="tab-pane fade" id="admin-tab-streets">
+          <div class="sc-card overflow-hidden">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                  <tr>
+                    <th class="ps-3">Street Name</th>
+                    <th>Area</th>
+                    <th>City &amp; Pincode</th>
+                    <th>Residents</th>
+                    <th>Total Issues</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-streets-tbody">
+                  <tr><td colspan="5" class="text-center py-4 text-muted">Loading registered streets...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Create Street Modal -->
+  <div class="modal fade" id="createStreetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-dark"><i class="bi bi-geo-alt-fill text-primary me-1"></i> Register New Street</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="createStreetForm" onsubmit="submitNewStreet(event)">
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Street Name *</label>
+              <input type="text" id="str-name" class="form-control" placeholder="e.g. Sardar Patel Road" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Area / Locality *</label>
+              <input type="text" id="str-area" class="form-control" placeholder="e.g. Adyar" required>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-semibold small">City *</label>
+                <input type="text" id="str-city" class="form-control" value="Chennai" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold small">Pincode *</label>
+                <input type="text" id="str-pincode" class="form-control" placeholder="600020" required>
+              </div>
+            </div>
+            <button type="submit" id="streetSubmitBtn" class="btn btn-primary w-100 py-2 fw-semibold rounded-3">
+              Create Street
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    let allAdminComplaints = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!Auth.requireRole('ROLE_ADMIN')) return;
+      await loadAdminStats();
+      await loadAdminComplaints();
+      await loadAdminUsers();
+      await loadAdminReports();
+      await loadAdminStreets();
+    });
+
+    async function loadAdminStats() {
+      try {
+        const res = await Api.get('/admin/stats');
+        const s = res.data;
+        if (!s) return;
+
+        document.getElementById('kpi-total-users').textContent = s.totalResidents || 0;
+        document.getElementById('kpi-total-streets').textContent = s.totalStreets || 0;
+        document.getElementById('kpi-total-complaints').textContent = s.totalComplaints || 0;
+        document.getElementById('kpi-pending').textContent = (s.pendingComplaints || 0) + (s.underReviewComplaints || 0);
+        document.getElementById('kpi-resolved').textContent = s.resolvedComplaints || 0;
+
+        // Render Charts
+        if (s.complaintsByCategory) {
+          new Chart(document.getElementById('adminCategoryChart'), {
+            type: 'pie',
+            data: {
+              labels: Object.keys(s.complaintsByCategory),
+              datasets: [{
+                data: Object.values(s.complaintsByCategory),
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#6366f1', '#64748b']
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } }
+            }
+          });
+        }
+
+        if (s.complaintsByStatus) {
+          new Chart(document.getElementById('adminStatusChart'), {
+            type: 'bar',
+            data: {
+              labels: Object.keys(s.complaintsByStatus),
+              datasets: [{
+                label: 'Complaints',
+                data: Object.values(s.complaintsByStatus),
+                backgroundColor: ['#f59e0b', '#8b5cf6', '#3b82f6', '#10b981', '#ef4444'],
+                borderRadius: 6
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load admin stats', err);
+      }
+    }
+
+    async function loadAdminComplaints() {
+      const tbody = document.getElementById('admin-complaints-tbody');
+      try {
+        const res = await Api.get('/complaints');
+        allAdminComplaints = res.data || [];
+        document.getElementById('admin-complaints-total-count').textContent = `${allAdminComplaints.length} complaints`;
+
+        renderAdminComplaintsRows(allAdminComplaints);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center">Failed to load: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderAdminComplaintsRows(list) {
+      const tbody = document.getElementById('admin-complaints-tbody');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No complaints found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(c => `
+        <tr id="admin-row-${c.id}">
+          <td class="ps-3">
+            <span class="badge bg-light text-dark border me-1">#${c.id}</span>
+            <a href="/pages/complaint-detail.html?id=${c.id}" class="text-dark fw-bold text-decoration-none">
+              ${c.title}
+            </a>
+          </td>
+          <td class="small text-muted">${c.street ? c.street.name : ''}</td>
+          <td><span class="badge-category small"><i class="bi ${c.category.icon}"></i> ${c.category.name}</span></td>
+          <td>${App.getPriorityBadge(c.priority)}</td>
+          <td>${App.getStatusBadge(c.status)}</td>
+          <td class="small fw-bold">👍 ${c.supportsCount}</td>
+          <td class="text-end pe-3">
+            <a href="/pages/complaint-detail.html?id=${c.id}" class="btn btn-sm btn-outline-primary rounded-pill px-2">
+              <i class="bi bi-eye"></i>
+            </a>
+            <button class="btn btn-sm btn-outline-danger rounded-pill px-2 ms-1" onclick="deleteComplaintByAdmin(${c.id})" title="Delete Complaint">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterAdminComplaintsTable(query) {
+      const q = query.toLowerCase();
+      const filtered = allAdminComplaints.filter(c =>
+        c.title.toLowerCase().includes(q) ||
+        (c.street && c.street.name.toLowerCase().includes(q)) ||
+        c.category.name.toLowerCase().includes(q)
+      );
+      renderAdminComplaintsRows(filtered);
+    }
+
+    async function deleteComplaintByAdmin(id) {
+      if (!confirm('ADMIN ACTION: Permanently remove this complaint from the system?')) return;
+      try {
+        await Api.delete(`/admin/complaints/${id}`);
+        App.showToast('Complaint removed permanently', 'info');
+        document.getElementById(`admin-row-${id}`)?.remove();
+      } catch (err) {
+        App.showToast(err.message || 'Deletion failed', 'danger');
+      }
+    }
+
+    async function loadAdminUsers() {
+      const tbody = document.getElementById('admin-users-tbody');
+      try {
+        const res = await Api.get('/admin/users');
+        const list = res.data || [];
+
+        tbody.innerHTML = list.map(u => `
+          <tr>
+            <td class="ps-3">
+              <div class="d-flex align-items-center gap-2">
+                <img src="${u.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}" class="user-avatar-sm" alt="${u.fullName}">
+                <span class="fw-bold text-dark">${u.fullName}</span>
+              </div>
+            </td>
+            <td>
+              <div class="small text-dark">${u.email}</div>
+              <div class="small text-muted">${u.mobileNumber}</div>
+            </td>
+            <td class="small text-muted">${u.street ? u.street.name : 'None'}</td>
+            <td>
+              <select class="form-select form-select-sm w-auto" onchange="changeUserRole(${u.id}, this.value)">
+                <option value="ROLE_RESIDENT" ${u.role === 'ROLE_RESIDENT' ? 'selected' : ''}>RESIDENT</option>
+                <option value="ROLE_MODERATOR" ${u.role === 'ROLE_MODERATOR' ? 'selected' : ''}>MODERATOR</option>
+                <option value="ROLE_ADMIN" ${u.role === 'ROLE_ADMIN' ? 'selected' : ''}>ADMIN</option>
+              </select>
+            </td>
+            <td>
+              <span class="badge ${u.isActive ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} small">
+                ${u.isActive ? 'Active' : 'Suspended'}
+              </span>
+            </td>
+            <td class="text-end pe-3">
+              <button class="btn btn-sm ${u.isActive ? 'btn-outline-danger' : 'btn-outline-success'} rounded-pill px-3" onclick="toggleUserStatus(${u.id}, ${!u.isActive})">
+                ${u.isActive ? 'Suspend' : 'Activate'}
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-danger text-center">Failed to load users: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function toggleUserStatus(id, newStatus) {
+      try {
+        await Api.put(`/admin/users/${id}/status`, { active: newStatus });
+        App.showToast(`User status updated to ${newStatus ? 'Active' : 'Suspended'}`, 'success');
+        await loadAdminUsers();
+      } catch (err) {
+        App.showToast(err.message || 'Status change failed', 'danger');
+      }
+    }
+
+    async function changeUserRole(id, newRole) {
+      try {
+        await Api.put(`/admin/users/${id}/role`, { role: newRole });
+        App.showToast(`User role updated to ${newRole}`, 'success');
+      } catch (err) {
+        App.showToast(err.message || 'Role update failed', 'danger');
+      }
+    }
+
+    async function loadAdminReports() {
+      const tbody = document.getElementById('admin-reports-tbody');
+      try {
+        const res = await Api.get('/admin/reports');
+        const list = res.data || [];
+        document.getElementById('kpi-reports').textContent = list.length;
+
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No flagged reports in queue. Everything is in order!</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = list.map(r => `
+          <tr>
+            <td class="ps-3">
+              <a href="/pages/complaint-detail.html?id=${r.complaintId}" class="text-dark fw-bold small text-decoration-none">
+                #${r.complaintId} - ${r.complaintTitle || 'View Complaint'}
+              </a>
+            </td>
+            <td class="small text-muted">${r.reportedByUserName}</td>
+            <td class="small text-danger fw-semibold">${r.reason}</td>
+            <td>
+              <span class="badge ${r.status === 'PENDING' ? 'bg-warning text-dark' : 'bg-success'} small">
+                ${r.status}
+              </span>
+            </td>
+            <td class="small text-muted">${r.actionNotes || 'None'}</td>
+            <td class="text-end pe-3">
+              <button class="btn btn-sm btn-outline-success rounded-pill px-2" onclick="resolveReportAction(${r.id}, 'REVIEWED', 'Verified compliant')">
+                Dismiss
+              </button>
+              <button class="btn btn-sm btn-danger rounded-pill px-2 ms-1" onclick="deleteComplaintByAdmin(${r.complaintId}); resolveReportAction(${r.id}, 'ACTION_TAKEN', 'Complaint removed by admin');">
+                Take Down
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-danger text-center">Failed to load reports</td></tr>`;
+      }
+    }
+
+    async function resolveReportAction(reportId, status, notes) {
+      try {
+        await Api.put(`/admin/reports/${reportId}`, { status, actionNotes: notes });
+        App.showToast('Report queue updated', 'info');
+        await loadAdminReports();
+      } catch (err) {
+        App.showToast(err.message || 'Report action failed', 'danger');
+      }
+    }
+
+    async function loadAdminStreets() {
+      const tbody = document.getElementById('admin-streets-tbody');
+      try {
+        const res = await Api.get('/streets');
+        const list = res.data || [];
+
+        tbody.innerHTML = list.map(s => `
+          <tr>
+            <td class="ps-3 fw-bold text-dark">${s.name}</td>
+            <td>${s.area}</td>
+            <td class="small text-muted">${s.city}, ${s.pincode}</td>
+            <td><span class="badge bg-primary rounded-pill px-2">${s.totalResidents}</span></td>
+            <td><span class="badge bg-light text-dark border px-2">${s.totalComplaints}</span></td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-danger text-center">Failed to load streets</td></tr>`;
+      }
+    }
+
+    async function submitNewStreet(e) {
+      e.preventDefault();
+      const btn = document.getElementById('streetSubmitBtn');
+      btn.disabled = true;
+
+      const payload = {
+        name: document.getElementById('str-name').value.trim(),
+        area: document.getElementById('str-area').value.trim(),
+        city: document.getElementById('str-city').value.trim(),
+        pincode: document.getElementById('str-pincode').value.trim()
+      };
+
+      try {
+        await Api.post('/streets', payload);
+        const modalEl = document.getElementById('createStreetModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+
+        App.showToast('Street created successfully!', 'success');
+        document.getElementById('createStreetForm').reset();
+        await loadAdminStreets();
+        await loadAdminStats();
+      } catch (err) {
+        App.showToast(err.message || 'Failed to create street', 'danger');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

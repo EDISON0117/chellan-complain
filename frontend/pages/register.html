@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join StreetConnect — Register</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100 py-5">
+
+  <div class="container" style="max-width: 680px;">
+    
+    <!-- Brand Logo -->
+    <div class="text-center mb-4">
+      <a href="/index.html" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+        <img src="/assets/logo.svg" alt="StreetConnect" width="44" height="44">
+        <span class="fs-3 fw-bold text-dark font-brand">Street<span class="text-primary">Connect</span></span>
+      </a>
+      <p class="text-muted small mt-1">“Your Street. Your Voice. Your Community.”</p>
+    </div>
+
+    <!-- Register Card -->
+    <div class="sc-card p-4 p-md-5 shadow-lg bg-white">
+      <h4 class="fw-bold text-dark mb-1">Create Resident Account</h4>
+      <p class="text-muted small mb-4">Join your street community to report civic issues and vote on solutions</p>
+
+      <form id="standaloneRegisterForm" onsubmit="handleRegisterSubmit(event)">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Full Name *</label>
+            <input type="text" id="regFullName" class="form-control" placeholder="e.g. Arun Prakash" required minlength="3">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Email Address *</label>
+            <input type="email" id="regEmail" class="form-control" placeholder="name@example.com" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Indian Mobile Number (10 digits) *</label>
+            <input type="tel" id="regMobile" class="form-control" placeholder="9840112233" required pattern="[6-9][0-9]{9}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Street / Locality *</label>
+            <select id="regStreetId" class="form-select" required>
+              <option value="">-- Choose your street --</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Create Password *</label>
+            <input type="password" id="regPassword" class="form-control" placeholder="Min 6 characters" required minlength="6">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Confirm Password *</label>
+            <input type="password" id="regConfirmPassword" class="form-control" placeholder="Re-enter password" required minlength="6">
+          </div>
+          <div class="col-12">
+            <div class="p-3 bg-light rounded-3 border">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="regNewStreetToggle" onchange="toggleNewStreetFields(this.checked)">
+                <label class="form-check-label small fw-semibold" for="regNewStreetToggle">
+                  My street is not listed above (Add a new street)
+                </label>
+              </div>
+              <div id="newStreetFields" class="row g-2 mt-2 d-none">
+                <div class="col-md-4">
+                  <input type="text" id="regNewStreetName" class="form-control form-control-sm" placeholder="Street Name">
+                </div>
+                <div class="col-md-3">
+                  <input type="text" id="regNewArea" class="form-control form-control-sm" placeholder="Area / Locality">
+                </div>
+                <div class="col-md-3">
+                  <input type="text" id="regNewCity" class="form-control form-control-sm" placeholder="City" value="Chennai">
+                </div>
+                <div class="col-md-2">
+                  <input type="text" id="regNewPincode" class="form-control form-control-sm" placeholder="Pincode">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" id="regSubmitBtn" class="btn btn-primary w-100 py-2 fw-semibold rounded-3">
+            <i class="bi bi-person-check me-1"></i> Register &amp; Join Street
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center mt-4">
+        <span class="text-muted small">Already a member?</span>
+        <a href="/pages/login.html" class="small fw-bold text-primary text-decoration-none ms-1">Sign in here</a>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/index.html" class="text-muted text-decoration-none small">
+        <i class="bi bi-arrow-left me-1"></i> Return to Homepage
+      </a>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.populateStreetDropdown('regStreetId');
+    });
+
+    function toggleNewStreetFields(show) {
+      const fields = document.getElementById('newStreetFields');
+      const select = document.getElementById('regStreetId');
+      if (show) {
+        fields.classList.remove('d-none');
+        select.removeAttribute('required');
+        select.value = '';
+      } else {
+        fields.classList.add('d-none');
+        select.setAttribute('required', 'required');
+      }
+    }
+
+    async function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('regSubmitBtn');
+      const pwd = document.getElementById('regPassword').value;
+      const confirmPwd = document.getElementById('regConfirmPassword').value;
+
+      if (pwd !== confirmPwd) {
+        App.showToast('Passwords do not match!', 'warning');
+        return;
+      }
+
+      const payload = {
+        fullName: document.getElementById('regFullName').value.trim(),
+        email: document.getElementById('regEmail').value.trim(),
+        mobileNumber: document.getElementById('regMobile').value.trim(),
+        password: pwd,
+        confirmPassword: confirmPwd
+      };
+
+      const isNewStreet = document.getElementById('regNewStreetToggle').checked;
+      if (isNewStreet) {
+        payload.streetName = document.getElementById('regNewStreetName').value.trim();
+        payload.area = document.getElementById('regNewArea').value.trim();
+        payload.city = document.getElementById('regNewCity').value.trim();
+        payload.pincode = document.getElementById('regNewPincode').value.trim();
+      } else {
+        payload.streetId = document.getElementById('regStreetId').value;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Creating account...`;
+
+      try {
+        await Auth.register(payload);
+        App.showToast('Account created! Welcome to StreetConnect.', 'success');
+        setTimeout(() => window.location.href = '/index.html', 600);
+      } catch (err) {
+        App.showToast(err.message || 'Registration failed.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = `<i class="bi bi-person-check me-1"></i> Register &amp; Join Street`;
+      }
+    }
+  </script>
+</body>
+</html>

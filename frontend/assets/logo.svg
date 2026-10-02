@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
+  <defs>
+    <linearGradient id="scGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <filter id="scShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#2563eb" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Location Pin Outline -->
+  <path d="M24 4C14.61 4 7 11.61 7 21C7 31.8 21.6 43.1 22.8 44C23.2 44.3 23.6 44.5 24 44.5C24.4 44.5 24.8 44.3 25.2 44C26.4 33.1 41 31.8 41 21C41 11.61 33.39 4 24 4Z" 
+        fill="url(#scGrad)" filter="url(#scShadow)"/>
+  
+  <!-- Roof / House Shape -->
+  <path d="M24 13L15 21H18V28H22V23H26V28H30V21H33L24 13Z" fill="#ffffff" />
+  
+  <!-- Signal / Pulse Wave -->
+  <circle cx="24" cy="20.5" r="2.2" fill="#38bdf8"/>
+</svg>

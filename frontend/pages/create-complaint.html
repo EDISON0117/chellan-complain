@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report an Issue — StreetConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-expand-lg sc-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/index.html">
+        <img src="/assets/logo.svg" alt="StreetConnect Logo" width="36" height="36">
+        <span>Street<span class="text-primary">Connect</span></span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#scNavContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="scNavContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          <li class="nav-item">
+            <a class="nav-link" href="/index.html"><i class="bi bi-house-door"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/index.html#complaints-section"><i class="bi bi-card-list"></i> Complaints</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pages/my-complaints.html"><i class="bi bi-collection"></i> My Complaints</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pages/community.html"><i class="bi bi-people"></i> Community</a>
+          </li>
+        </ul>
+
+        <div id="navbar-auth-section" class="d-flex align-items-center gap-2"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="py-5">
+    <div class="container" style="max-width: 820px;">
+
+      <!-- Header Card -->
+      <div class="text-center mb-4">
+        <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill mb-2">
+          <i class="bi bi-megaphone-fill me-1"></i> Public Civic Report
+        </span>
+        <h2 class="fw-bold text-dark">Report a Street Issue</h2>
+        <p class="text-muted">
+          Your complaint will be published to your street community and forwarded to assigned moderators.
+        </p>
+      </div>
+
+      <!-- Complaint Form Card -->
+      <div class="sc-card p-4 p-md-5 bg-white shadow-sm">
+        <form id="createComplaintForm" onsubmit="handleSubmitComplaint(event)">
+
+          <!-- Title -->
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-dark">
+              Complaint Title * <span class="text-muted fw-normal">(Concise summary)</span>
+            </label>
+            <input type="text" id="comp-title" class="form-control form-control-lg fs-6" placeholder="e.g. Street Light Not Working Near Corner House" required minlength="5" maxlength="200">
+            <div class="form-text">Clear titles help your neighbors immediately recognize and support the issue.</div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <!-- Category -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-dark">Category *</label>
+              <select id="comp-category" class="form-select form-select-lg fs-6" required>
+                <option value="">-- Choose Category --</option>
+              </select>
+            </div>
+
+            <!-- Priority -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-dark">Urgency / Priority *</label>
+              <select id="comp-priority" class="form-select form-select-lg fs-6" required>
+                <option value="LOW">Low (Cosmetic / Non-disruptive)</option>
+                <option value="MEDIUM" selected>Medium (Standard civic problem)</option>
+                <option value="HIGH">High (Substantial neighborhood impact)</option>
+                <option value="CRITICAL">Critical (Immediate danger / Hazard)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <!-- Street -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-dark">Street / Locality *</label>
+              <select id="comp-street" class="form-select form-select-lg fs-6" required>
+                <option value="">-- Select Street --</option>
+              </select>
+            </div>
+
+            <!-- Landmark -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-dark">Landmark / Location Details</label>
+              <input type="text" id="comp-landmark" class="form-control form-control-lg fs-6" placeholder="e.g. Opposite House #24, Near Vinayagar Temple">
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-dark">Detailed Description *</label>
+            <textarea id="comp-description" class="form-control" rows="5" placeholder="Provide accurate details about how long this issue has persisted, exact location, and who is affected..." required minlength="10" maxlength="5000"></textarea>
+            <div class="d-flex justify-content-between text-muted small mt-1">
+              <span>Minimum 10 characters</span>
+              <span id="desc-count">0 / 5000</span>
+            </div>
+          </div>
+
+          <!-- Image Upload with Live Preview -->
+          <div class="mb-4 p-4 border border-dashed rounded-4 bg-light text-center">
+            <label class="form-label fw-bold text-dark d-block mb-1">
+              <i class="bi bi-camera text-primary fs-3 d-block mb-1"></i>
+              Upload Issue Photo
+            </label>
+            <p class="small text-muted mb-3">Attach a photo of the problem for fast verification (JPG, PNG, WEBP, max 10MB)</p>
+            
+            <input type="file" id="comp-file" class="form-control d-none" accept="image/*" onchange="handleFileSelect(this)">
+            <button type="button" class="btn btn-outline-primary px-4 rounded-pill" onclick="document.getElementById('comp-file').click()">
+              <i class="bi bi-upload me-1"></i> Choose Photo
+            </button>
+
+            <!-- Image Preview Box -->
+            <div id="image-preview-wrapper" class="mt-3 d-none position-relative d-inline-block">
+              <img id="image-preview" src="" alt="Preview" class="img-thumbnail rounded-4 shadow-sm" style="max-height: 250px;">
+              <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 m-2" onclick="clearSelectedImage()" title="Remove photo">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Contact Number -->
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-dark">Contact Phone <span class="text-muted fw-normal">(Optional for follow-up)</span></label>
+            <input type="tel" id="comp-contact" class="form-control" placeholder="10-digit mobile number">
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid mt-4">
+            <button type="submit" id="submitComplaintBtn" class="btn btn-primary btn-lg fw-bold py-3 rounded-3">
+              <i class="bi bi-send-fill me-2"></i> Submit Issue to Street Feed
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    let selectedImageFile = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Require authentication to file a complaint
+      if (!Auth.isLoggedIn()) {
+        App.showToast('Please sign in to report a street issue', 'info');
+        const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+        modal.show();
+      }
+
+      // Populate user's default contact
+      const user = Auth.getUser();
+      if (user && user.mobileNumber) {
+        document.getElementById('comp-contact').value = user.mobileNumber;
+      }
+
+      // Word count listener
+      const descInput = document.getElementById('comp-description');
+      descInput.addEventListener('input', () => {
+        document.getElementById('desc-count').textContent = `${descInput.value.length} / 5000`;
+      });
+
+      await loadDropdowns();
+    });
+
+    async function loadDropdowns() {
+      // Categories
+      try {
+        const catRes = await Api.get('/categories');
+        const catSelect = document.getElementById('comp-category');
+        if (catRes.data) {
+          catRes.data.forEach(c => {
+            catSelect.insertAdjacentHTML('beforeend', `<option value="${c.id}">${c.name}</option>`);
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      // Streets
+      try {
+        const streetRes = await Api.get('/streets');
+        const streetSelect = document.getElementById('comp-street');
+        const user = Auth.getUser();
+        if (streetRes.data) {
+          streetRes.data.forEach(s => {
+            const isUserStreet = user && user.street && user.street.id === s.id;
+            streetSelect.insertAdjacentHTML('beforeend', `
+              <option value="${s.id}" ${isUserStreet ? 'selected' : ''}>
+                ${s.name}, ${s.area} (${s.city})
+              </option>
+            `);
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function handleFileSelect(input) {
+      if (input.files && input.files[0]) {
+        selectedImageFile = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('image-preview').src = e.target.result;
+          document.getElementById('image-preview-wrapper').classList.remove('d-none');
+        };
+        reader.readAsDataURL(selectedImageFile);
+      }
+    }
+
+    function clearSelectedImage() {
+      selectedImageFile = null;
+      document.getElementById('comp-file').value = '';
+      document.getElementById('image-preview').src = '';
+      document.getElementById('image-preview-wrapper').classList.add('d-none');
+    }
+
+    async function handleSubmitComplaint(e) {
+      e.preventDefault();
+
+      if (!Auth.isLoggedIn()) {
+        const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+        modal.show();
+        return;
+      }
+
+      const btn = document.getElementById('submitComplaintBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Publishing complaint...`;
+
+      try {
+        let imageUrl = null;
+
+        // Upload file if selected
+        if (selectedImageFile) {
+          btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Uploading photo...`;
+          const uploadRes = await Api.uploadFile(selectedImageFile);
+          if (uploadRes && uploadRes.data && uploadRes.data.url) {
+            imageUrl = uploadRes.data.url;
+          }
+        }
+
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Saving to street feed...`;
+
+        const payload = {
+          title: document.getElementById('comp-title').value.trim(),
+          description: document.getElementById('comp-description').value.trim(),
+          categoryId: document.getElementById('comp-category').value,
+          streetId: document.getElementById('comp-street').value,
+          priority: document.getElementById('comp-priority').value,
+          landmark: document.getElementById('comp-landmark').value.trim(),
+          contactNumber: document.getElementById('comp-contact').value.trim(),
+          imageUrl: imageUrl
+        };
+
+        const res = await Api.post('/complaints', payload);
+        App.showToast('Issue filed successfully! Redirecting...', 'success');
+
+        setTimeout(() => {
+          window.location.href = `/pages/complaint-detail.html?id=${res.data.id}`;
+        }, 800);
+
+      } catch (err) {
+        App.showToast(err.message || 'Could not post complaint', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = `<i class="bi bi-send-fill me-2"></i> Submit Issue to Street Feed`;
+      }
+    }
+  </script>
+</body>
+</html>
